@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>douxdev — Le dev doux</title>
+<title>Le dev doux</title>
 <meta name="description" content="Le glacier du dev doux : de petites applis faites maison, à la fraise.">
 <meta name="theme-color" content="#FF8FA6">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 30'%3E%3Cpath d='M4 13 L18 13 L11 28 Z' fill='%23E9B872' stroke='%231A1110' stroke-width='2.5' stroke-linejoin='round'/%3E%3Ccircle cx='11' cy='9' r='7.5' fill='%23FF8FA6' stroke='%231A1110' stroke-width='2.5'/%3E%3C/svg%3E">
@@ -117,6 +117,50 @@
   .btn-dark { background: #1A1110; color: #FFF6E4; }
   .btn-light { background: #FFF6E4; color: #1A1110; }
 
+  /* La tout doux liste : un ticket de commande du glacier */
+  .ticket {
+    --vitesse-ticket: 260ms; /* écart entre deux lignes imprimées : plus grand = plus lent */
+    width: 100%; max-width: 640px; margin-inline: auto; background: var(--paper);
+    border: 3px solid var(--ink); border-radius: 18px; padding: 22px 20px 18px;
+    box-shadow: 6px 6px 0 var(--ink); transition: background-color .35s ease;
+  }
+  .ticket-head { text-align: center; border-bottom: 3px dashed var(--ink); padding-bottom: 14px; }
+  .ticket-head h2 { margin: 0 0 4px; }
+  .ticket-head p { margin: 0; font-size: 12px; font-weight: 700; color: var(--soft); }
+  .ticket-list { list-style: none; margin: 0; padding: 6px 0; }
+  .ticket-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 12px 0; border-bottom: 2px dotted var(--soft); }
+  .scoop { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--c); border: 3px solid var(--ink); }
+  .todo-text { flex: 1 1 180px; display: flex; flex-direction: column; line-height: 1.35; }
+  .todo-text strong { font-size: 15px; }
+  .todo-parfum { font-size: 12px; color: var(--soft); }
+  .etat { margin-left: auto; font-weight: 700; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; border: 2px solid var(--ink); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+  [data-etat="frigo"] .etat { border-style: dashed; }
+  [data-etat="fond"] .etat { background: var(--fraise); color: var(--on-fraise); }
+  [data-etat="deguste"] .etat { background: var(--pistache); color: #1A1110; }
+  [data-etat="deguste"] .todo-text strong { text-decoration: line-through; text-decoration-thickness: 2px; }
+  [data-etat="volonte"] .etat { background: var(--ink); color: var(--bg); }
+  .ticket-total { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; font-weight: 700; }
+  .ticket-total .display { font-size: 64px; line-height: 1; padding-right: 6px; color: var(--fraise); -webkit-text-stroke: 2.5px var(--ink); }
+  .ticket-foot { margin: 14px 0 0; padding-top: 12px; border-top: 3px dashed var(--ink); text-align: center; font-size: 12px; color: var(--soft); }
+
+  /* Le ticket s'imprime ligne par ligne, puis chaque état est tamponné.
+     Déroulé (piloté par le JS en bas de page) :
+     1. Le JS donne à chaque ligne la classe .line et son numéro --i (0 = en-tête, puis les boules, le total, le pied).
+     2. Quand le ticket arrive à l'écran, le JS ajoute .is-printing : chaque ligne s'imprime
+        après --i × --vitesse-ticket (« print » : se déroule de haut en bas en 5 à-coups, comme une imprimante thermique).
+     3. 450ms après sa ligne, l'étiquette d'état tombe comme un tampon (« stamp » : arrive grossie et penchée).
+     4. Le JS fait défiler le total puis affiche ∞ avec un dernier coup de tampon (.is-done).
+     Réglages : --vitesse-ticket (sur .ticket), la durée .5s et steps(5) de print, le +450ms des tampons.
+     Le clip-path déborde de 40px sur les côtés pour ne pas rogner le ∞ ni les tampons grossis.
+     Sans JS ou avec « moins d'animations », .line n'est jamais ajouté / tout est affiché directement. */
+  .ticket .line { opacity: 0; clip-path: inset(-40px -40px 100% -40px); transform: translateY(-6px); }
+  .ticket.is-printing .line { animation: print .5s steps(5, end) forwards; animation-delay: calc(var(--i) * var(--vitesse-ticket)); }
+  .ticket .etat { opacity: 0; }
+  .ticket.is-printing .etat { animation: stamp .35s cubic-bezier(.3,1.6,.5,1) forwards; animation-delay: calc(var(--i) * var(--vitesse-ticket) + 450ms); }
+  .ticket-total .display.is-done { animation: stamp .35s cubic-bezier(.3,1.6,.5,1); }
+  @keyframes print { to { opacity: 1; clip-path: inset(-40px); transform: none; } }
+  @keyframes stamp { from { opacity: 0; transform: scale(1.8) rotate(-14deg); } to { opacity: 1; transform: rotate(-3deg); } }
+
   footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; border-top: 3px solid var(--ink); padding-top: 16px; font-size: 13px; font-weight: 700; }
 
   /* Apparition au scroll */
@@ -130,6 +174,7 @@
   @media (prefers-reduced-motion: reduce) {
     .marquee-track, .cone, .drips span { animation: none; }
     .reveal { opacity: 1; transform: none; transition: none; }
+    .ticket .line, .ticket .etat { opacity: 1; clip-path: none; transform: none; animation: none !important; }
   }
 </style>
 </head>
@@ -237,6 +282,43 @@
     </section>
   </div>
 
+  <section class="ticket reveal" aria-labelledby="toutdoux">
+    <div class="ticket-head">
+      <h2 class="display" id="toutdoux">La tout doux liste</h2>
+      <p>BON DE COMMANDE N°001 · À PRÉPARER SANS SE PRESSER</p>
+    </div>
+    <!-- État d'une boule (data-etat) : frigo = pas commencé · fond = en cours · deguste = fait · volonte = sans fin -->
+    <ol class="ticket-list">
+      <li data-etat="frigo">
+        <span class="scoop" style="--c:#BFE0A0" aria-hidden="true"></span>
+        <span class="todo-text"><strong>Installer Linux</strong><span class="todo-parfum">Parfum pingouin-menthe</span></span>
+        <span class="etat">Au congélateur</span>
+      </li>
+      <li data-etat="fond">
+        <span class="scoop" style="--c:#FF8FA6" aria-hidden="true"></span>
+        <span class="todo-text"><strong>Des stats sur Whiteboard</strong><span class="todo-parfum">Parfum fraise-courbes</span></span>
+        <span class="etat">Ça fond</span>
+      </li>
+      <li data-etat="frigo">
+        <span class="scoop" style="--c:#E9B872" aria-hidden="true"></span>
+        <span class="todo-text"><strong>Plusieurs templates d'images</strong><span class="todo-parfum">Parfum tutti frutti</span></span>
+        <span class="etat">Au congélateur</span>
+      </li>
+      <li data-etat="volonte">
+        <span class="scoop" style="--c:#FFF6E4" aria-hidden="true"></span>
+        <span class="todo-text"><strong>Faire mes séances de sport</strong><span class="todo-parfum">Sorbet citron-gainage</span></span>
+        <span class="etat">À volonté</span>
+      </li>
+      <li data-etat="volonte">
+        <span class="scoop" style="--c:#6B3E26" aria-hidden="true"></span>
+        <span class="todo-text"><strong>Être encore plus sucré</strong><span class="todo-parfum">Supplément triple chantilly</span></span>
+        <span class="etat">À volonté</span>
+      </li>
+    </ol>
+    <div class="ticket-total"><span>TOTAL SUCRE</span><span class="display">∞</span></div>
+    <p class="ticket-foot">✂ Aucune date limite. Ici, tout se fait douxcement.</p>
+  </section>
+
   <footer>
     <span>Fait avec douceur et beaucoup de fraise.</span>
     <span>douxdev.fr · <span id="year"></span></span>
@@ -294,6 +376,36 @@
     items.forEach(function (el) { io.observe(el); });
   } else {
     items.forEach(function (el) { el.classList.add('is-in'); });
+  }
+
+  /* ---- Le ticket de la tout doux liste s'imprime quand on arrive dessus ---- */
+  var ticket = document.querySelector('.ticket');
+  /* Voir le commentaire CSS « Le ticket s'imprime… » pour le déroulé complet */
+  if (ticket && 'IntersectionObserver' in window && !reduce) {
+    /* Même vitesse que le CSS, pour caler le compteur sur l'impression du total (toujours en ms) */
+    var vitesse = parseFloat(getComputedStyle(ticket).getPropertyValue('--vitesse-ticket')) || 260;
+    /* Les lignes à imprimer, dans l'ordre : leur numéro --i fixe leur délai d'apparition */
+    var lines = ticket.querySelectorAll('.ticket-head, .ticket-list li, .ticket-total, .ticket-foot');
+    lines.forEach(function (el, i) { el.classList.add('line'); el.style.setProperty('--i', i); });
+    var total = ticket.querySelector('.ticket-total .display');
+    var tio = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      tio.disconnect(); /* une seule impression par visite */
+      ticket.classList.add('is-printing');
+      /* Le total défile comme une caisse enregistreuse avant de s'arrêter sur ∞.
+         Réglages : 120 = taille max d'un saut, 90 = pause entre deux chiffres (ms), 999 = chiffre d'arrivée. */
+      var n = 0;
+      setTimeout(function roll() {
+        n += Math.ceil(Math.random() * 120);
+        total.textContent = n;
+        if (n < 999) { setTimeout(roll, 90); return; }
+        total.textContent = '∞';
+        total.classList.add('is-done');
+      /* Démarrage : le total est l'avant-dernière ligne (length - 2), +200ms pour qu'elle soit déjà un peu imprimée */
+      }, (lines.length - 2) * vitesse + 200);
+    /* -30% : l'impression démarre quand le haut du ticket atteint ~70% de la hauteur de l'écran */
+    }, { rootMargin: '0px 0px -30% 0px' });
+    tio.observe(ticket);
   }
 
   /* ---- Petit plaisir : un tap sur le cornet lâche des vermicelles ---- */
