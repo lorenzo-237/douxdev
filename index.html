@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="fr" data-theme="vanille">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>douxdev — Le dev doux</title>
+<meta name="description" content="Le glacier du dev doux : de petites applis faites maison, à la fraise.">
+<meta name="theme-color" content="#FF8FA6">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 30'%3E%3Cpath d='M4 13 L18 13 L11 28 Z' fill='%23E9B872' stroke='%231A1110' stroke-width='2.5' stroke-linejoin='round'/%3E%3Ccircle cx='11' cy='9' r='7.5' fill='%23FF8FA6' stroke='%231A1110' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script>
+  /* Applique le thème avant l'affichage pour éviter un flash */
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('douxdev-theme'); } catch (e) {}
+    if (!t) t = 'vanille';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<style>
+  :root {
+    --fraise: #FF8FA6;
+    --on-fraise: #1A1110;
+    --cornet: #E9B872;
+    --pistache: #BFE0A0;
+    --display: 'Archivo Black', 'Arial Black', sans-serif;
+    --mono: 'Space Mono', ui-monospace, monospace;
+  }
+  [data-theme="vanille"] { --bg: #FFF6E4; --ink: #1A1110; --paper: #FFFFFF; --soft: #5A4038; }
+  [data-theme="chocolat"] { --bg: #2A1712; --ink: #FFEFDF; --paper: #3A2219; --soft: #E8CDBE; }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--mono); font-size: 15px; line-height: 1.6;
+    transition: background-color .35s ease, color .35s ease;
+    overflow-x: hidden;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--fraise); outline-offset: 3px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; }
+  .display { font-family: var(--display); font-weight: 400; text-transform: uppercase; letter-spacing: -.02em; }
+
+  /* Barre du haut : bandeau + jauge de sucre */
+  .top { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 3px solid var(--ink); transition: background-color .35s ease; }
+  .marquee { background: var(--ink); color: var(--bg); overflow: hidden; padding: 8px 0; font-weight: 700; font-size: 13px; letter-spacing: .08em; }
+  .marquee-track { display: flex; width: max-content; animation: marquee 20s linear infinite; }
+  .marquee-track span { padding-right: 24px; white-space: nowrap; }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+
+  .gauge { display: flex; align-items: center; gap: 12px; padding-block: 10px; font-size: 12px; font-weight: 700; }
+  .gauge-track { flex: 1; height: 18px; border: 3px solid var(--ink); border-radius: 999px; overflow: hidden; background: var(--paper); }
+  .gauge-fill {
+    height: 100%; width: 100%; transform-origin: left; transform: scaleX(0);
+    background: var(--fraise) radial-gradient(circle, rgba(255,246,228,.9) 1.4px, transparent 1.6px) 0 0 / 12px 9px;
+  }
+  .gauge-value { min-width: 44px; text-align: right; }
+  .gauge.is-full .gauge-value { color: var(--fraise); }
+
+  /* En-tête */
+  .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-block: 14px; }
+  .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; font-family: var(--display); font-size: 18px; }
+  .logo svg path, .logo svg circle { stroke: var(--ink); }
+  .switch { display: flex; border: 3px solid var(--ink); border-radius: 999px; overflow: hidden; }
+  .switch button {
+    min-height: 44px; padding: 0 14px; border: 0; background: transparent; color: var(--ink);
+    font: 700 13px var(--mono); cursor: pointer; transition: background-color .2s ease, color .2s ease;
+  }
+  .switch button + button { border-left: 3px solid var(--ink); }
+  .switch button[aria-pressed="true"] { background: var(--fraise); color: var(--on-fraise); }
+
+  /* Hero */
+  .hero { position: relative; background: var(--fraise); color: var(--on-fraise); border-block: 3px solid var(--ink); padding: 30px 0 84px; }
+  .hero-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; }
+  .hero-text { flex: 999 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+  .chip { align-self: flex-start; font-weight: 700; font-size: 12px; background: #FFF6E4; border: 3px solid #1A1110; border-radius: 999px; padding: 6px 12px; }
+  .hero h1 { margin: 0; font-size: clamp(60px, 17vw, 150px); line-height: .86; }
+  .hero h1 span { display: inline-block; }
+  .hero p { margin: 0; max-width: 36ch; background: #FFF6E4; border: 3px solid #1A1110; border-radius: 16px; padding: 14px; }
+  .hero-cone { flex: 1 1 160px; display: flex; justify-content: center; }
+  .cone { width: 160px; height: auto; animation: bob 4s ease-in-out infinite; transform-origin: 50% 90%; cursor: pointer; }
+  @keyframes bob { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
+  .drips { position: absolute; left: 0; right: 0; bottom: -3px; height: 0; display: flex; justify-content: space-around; align-items: flex-start; pointer-events: none; }
+  .drips span { width: var(--w); height: var(--h); background: var(--fraise); border: 3px solid var(--ink); border-top: 0; border-radius: 0 0 99px 99px; animation: drip 3.4s ease-in-out infinite; animation-delay: var(--d); }
+  @keyframes drip { 0%,100% { height: var(--h); } 50% { height: calc(var(--h) + 14px); } }
+
+  /* Contenu */
+  main { padding-block: 84px 40px; display: flex; flex-direction: column; gap: 56px; }
+  h2 { margin: 0 0 20px; font-size: 30px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .card {
+    display: flex; flex-direction: column; text-decoration: none; background: var(--paper);
+    border: 3px solid var(--ink); border-radius: 18px; overflow: hidden; box-shadow: 6px 6px 0 var(--ink);
+    transition: transform .15s ease, box-shadow .15s ease, background-color .35s ease;
+  }
+  a.card:hover, a.card:focus-visible { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--ink); }
+  a.card:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+  .card-head { display: flex; justify-content: space-between; gap: 8px; background: var(--fraise); color: var(--on-fraise); border-bottom: 3px solid var(--ink); padding: 12px 14px; font-weight: 700; font-size: 12px; }
+  .card-body { padding: 16px 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .card-title { font-size: 32px; line-height: 1; }
+  .card-desc { color: var(--soft); }
+  .pill { align-self: flex-start; font-weight: 700; font-size: 13px; background: var(--ink); color: var(--bg); border-radius: 999px; padding: 10px 16px; }
+  .card.soon { background: transparent; border-style: dashed; box-shadow: none; }
+  .card.soon .card-head { background: transparent; color: inherit; border-bottom-style: dashed; }
+
+  .duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+  .box { display: flex; flex-direction: column; gap: 12px; background: var(--paper); border: 3px solid var(--ink); border-radius: 18px; padding: 20px; transition: background-color .35s ease; }
+  .box h2 { margin: 0; font-size: 26px; }
+  .box p { margin: 0; }
+  .box.contact { background: var(--pistache); color: #1A1110; }
+  .buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 999px; text-decoration: none; font-weight: 700; font-size: 14px; border: 3px solid #1A1110; transition: transform .12s ease; }
+  .btn:active { transform: translate(2px, 2px); }
+  .btn-dark { background: #1A1110; color: #FFF6E4; }
+  .btn-light { background: #FFF6E4; color: #1A1110; }
+
+  footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; border-top: 3px solid var(--ink); padding-top: 16px; font-size: 13px; font-weight: 700; }
+
+  /* Apparition au scroll */
+  .reveal { opacity: 0; transform: translate(10px, 10px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
+  .reveal.is-in { opacity: 1; transform: none; }
+
+  /* Petites billes de sucre au clic sur le cornet */
+  .sprinkle { position: fixed; width: 6px; height: 14px; border-radius: 3px; pointer-events: none; z-index: 20; animation: fall 1s cubic-bezier(.3,.6,.4,1) forwards; }
+  @keyframes fall { to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track, .cone, .drips span { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>FRAISE ✦ VANILLE ✦ CHOCOLAT ✦ JAVASCRIPT ✦ FRAISE ✦ PYTHON ✦ CHANTILLY ✦ WINDEV ✦</span>
+      <span>FRAISE ✦ VANILLE ✦ CHOCOLAT ✦ JAVASCRIPT ✦ FRAISE ✦ PYTHON ✦ CHANTILLY ✦ WINDEV ✦</span>
+    </div>
+  </div>
+  <div class="wrap gauge" id="gauge">
+    <span>SUCRE</span>
+    <div class="gauge-track" role="progressbar" aria-label="Niveau de sucre" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="gauge-fill"></div>
+    </div>
+    <span class="gauge-value">0%</span>
+  </div>
+</div>
+
+<header class="wrap header">
+  <a class="logo" href="/">
+    <svg aria-hidden="true" width="22" height="30" viewBox="0 0 22 30"><path d="M4 13 L18 13 L11 28 Z" fill="#E9B872" stroke-width="2.5" stroke-linejoin="round"/><circle cx="11" cy="9" r="7.5" fill="#FF8FA6" stroke-width="2.5"/></svg>
+    douxdev
+  </a>
+  <div class="switch" role="group" aria-label="Parfum du site">
+    <button type="button" data-theme-btn="vanille" aria-pressed="true">Vanille</button>
+    <button type="button" data-theme-btn="chocolat" aria-pressed="false">Chocolat</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div class="hero-text">
+      <span class="chip">PARFUM DU JOUR : FRAISE</span>
+      <h1 class="display"><span>Le dev</span> <span>doux</span></h1>
+      <p>Bienvenue au glacier. Ici on code tranquillement, avec une préférence assumée pour la fraise. Installe-toi et choisis ton parfum.</p>
+    </div>
+    <div class="hero-cone">
+      <svg class="cone" id="cone" viewBox="0 0 120 170" role="img" aria-label="Cornet de glace à la fraise">
+        <path d="M28 82 L92 82 L60 164 Z" fill="#E9B872" stroke="#1A1110" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M40 96 L78 132 M54 90 L84 118 M80 96 L46 132 M66 90 L36 118" stroke="#B9823F" stroke-width="3" stroke-linecap="round"/>
+        <path d="M22 78 C14 40 40 18 60 18 C82 18 106 40 98 78 C96 92 88 84 86 96 C84 106 76 104 76 92 C74 84 64 88 62 98 C60 108 50 106 50 94 C48 84 38 90 34 98 C30 104 22 96 22 78 Z" fill="#FF8FA6" stroke="#1A1110" stroke-width="4" stroke-linejoin="round"/>
+        <g fill="#FFF6E4">
+          <ellipse cx="44" cy="44" rx="2.4" ry="3.4"/><ellipse cx="62" cy="36" rx="2.4" ry="3.4"/>
+          <ellipse cx="78" cy="50" rx="2.4" ry="3.4"/><ellipse cx="54" cy="60" rx="2.4" ry="3.4"/>
+          <ellipse cx="38" cy="66" rx="2.4" ry="3.4"/><ellipse cx="74" cy="70" rx="2.4" ry="3.4"/>
+        </g>
+        <path d="M60 18 C56 8 62 2 70 4 C66 8 64 12 60 18 Z" fill="#7FB86A" stroke="#1A1110" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+  <div class="drips" aria-hidden="true">
+    <span style="--w:22px;--h:34px;--d:0s"></span>
+    <span style="--w:18px;--h:56px;--d:.8s"></span>
+    <span style="--w:26px;--h:24px;--d:1.6s"></span>
+    <span style="--w:20px;--h:44px;--d:2.2s"></span>
+  </div>
+</section>
+
+<main class="wrap">
+  <section aria-labelledby="parfums">
+    <h2 class="display" id="parfums">La carte des parfums</h2>
+    <div class="cards">
+      <!-- Pour ajouter un projet : copie ce bloc <a class="card ..."> et change le lien, le numéro et le texte -->
+      <a class="card reveal" href="https://wb.douxdev.fr">
+        <div class="card-head"><span>PARFUM N°01</span><span>FRAISE-HALTÈRES</span></div>
+        <div class="card-body">
+          <span class="card-title display">Whiteboard</span>
+          <span class="card-desc">Pour suivre tes séances de sport sans prise de tête : tu notes, tu coches, tu progresses.</span>
+          <span class="pill">Goûter → wb.douxdev.fr</span>
+        </div>
+      </a>
+      <!-- Carte d'attente : supprime-la quand tu as un 2e projet -->
+      <div class="card soon reveal">
+        <div class="card-head"><span>PARFUM N°02</span><span>SURPRISE</span></div>
+        <div class="card-body">
+          <span class="card-title display">Prochain parfum</span>
+          <span class="card-desc">Il prend le temps de bien prendre. Ça vaut le coup d'attendre.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="duo">
+    <section class="box reveal" aria-labelledby="apropos">
+      <h2 class="display" id="apropos">À propos</h2>
+      <p>Passionné d'informatique et de glace à la fraise, je fabrique de petites applis simples et utiles.</p>
+      <p class="card-desc">Si tu as des questions ou besoin de conseils, n'hésite pas à me contacter</p>
+    </section>
+    <section class="box contact reveal" aria-labelledby="contact">
+      <h2 class="display" id="contact">Un petit mot ?</h2>
+      <p>Une idée, une question, un bug à signaler : écris-moi, je réponds avec plaisir.</p>
+      <div class="buttons">
+        <a class="btn btn-dark" href="mailto:lorenzo.softdev@gmail.com">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+          M'écrire
+        </a>
+        <a class="btn btn-light" href="https://github.com/lorenzo-237" rel="me">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4 1.5-4-2-6-2.5M15 21v-3.5a3 3 0 0 0-.9-2.4c3-.3 6-1.4 6-6.6a5 5 0 0 0-1.4-3.5 4.7 4.7 0 0 0-.1-3.5s-1.1-.3-3.6 1.4a12.3 12.3 0 0 0-6.4 0C6.1 1.2 5 1.5 5 1.5a4.7 4.7 0 0 0-.1 3.5A5 5 0 0 0 3.5 8.5c0 5.2 3 6.3 6 6.6a3 3 0 0 0-.9 2.4V21"/></svg>
+          GitHub
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <span>Fait avec douceur et beaucoup de fraise.</span>
+    <span>douxdev.fr · <span id="year"></span></span>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- Interrupteur vanille / chocolat ---- */
+  var buttons = document.querySelectorAll('[data-theme-btn]');
+  function setTheme(name) {
+    root.setAttribute('data-theme', name);
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.themeBtn === name)); });
+    try { localStorage.setItem('douxdev-theme', name); } catch (e) {}
+  }
+  buttons.forEach(function (b) { b.addEventListener('click', function () { setTheme(b.dataset.themeBtn); }); });
+  setTheme(root.getAttribute('data-theme') || 'vanille');
+
+  /* ---- Jauge de sucre qui monte au scroll ---- */
+  var gauge = document.getElementById('gauge');
+  var fill = gauge.querySelector('.gauge-fill');
+  var bar = gauge.querySelector('[role="progressbar"]');
+  var value = gauge.querySelector('.gauge-value');
+  var ticking = false;
+  function updateGauge() {
+    ticking = false;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = max > 0 ? Math.min(100, Math.max(0, Math.round(window.scrollY / max * 100))) : 100;
+    fill.style.transform = 'scaleX(' + pct / 100 + ')';
+    bar.setAttribute('aria-valuenow', pct);
+    value.textContent = pct >= 100 ? 'MAX !' : pct + '%';
+    gauge.classList.toggle('is-full', pct >= 100);
+  }
+  window.addEventListener('scroll', function () {
+    if (!ticking) { ticking = true; requestAnimationFrame(updateGauge); }
+  }, { passive: true });
+  window.addEventListener('resize', updateGauge);
+  updateGauge();
+
+  /* ---- Apparition des cartes ---- */
+  var items = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en, i) {
+        if (en.isIntersecting) {
+          en.target.style.transitionDelay = (i * 80) + 'ms';
+          en.target.classList.add('is-in');
+          io.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add('is-in'); });
+  }
+
+  /* ---- Petit plaisir : un tap sur le cornet lâche des vermicelles ---- */
+  var cone = document.getElementById('cone');
+  var colors = ['#FF8FA6', '#FFF6E4', '#BFE0A0', '#E9B872', '#6B3E26'];
+  cone.addEventListener('click', function (e) {
+    if (reduce) return;
+    for (var i = 0; i < 14; i++) {
+      var s = document.createElement('span');
+      s.className = 'sprinkle';
+      s.style.left = e.clientX + 'px';
+      s.style.top = e.clientY + 'px';
+      s.style.background = colors[i % colors.length];
+      s.style.setProperty('--x', (Math.random() * 160 - 80) + 'px');
+      s.style.setProperty('--y', (Math.random() * 120 + 40) + 'px');
+      s.style.setProperty('--r', (Math.random() * 540 - 270) + 'deg');
+      document.body.appendChild(s);
+      s.addEventListener('animationend', function () { this.remove(); });
+    }
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
